@@ -49,11 +49,19 @@ ipcMain.handle(IpcHandlerMessages.START_HOOK, async (event) => {
 				} catch (_) {}
 			}
 		});
+		iohook.on('keydown', (ev: IOHookEvent) => {
+			const ImpostorKey = store.get('ImpostorpushToTalkShortcut');
+			if (!isMouseButton(ImpostorKey) && keyCodeMatches(ImpostorKey as K, ev)) {
+				try {
+					event.sender.send(IpcRendererMessages.PUSH_TO_TALK, true);
+				} catch (_) {}
+			}
+		});
 		iohook.on('keyup', (ev: IOHookEvent) => {
 			const shortcutKey = store.get('pushToTalkShortcut');
 			if (!isMouseButton(shortcutKey) && keyCodeMatches(shortcutKey as K, ev)) {
 				try {
-					event.sender.send(IpcRendererMessages.PUSH_TO_TALK, false);
+					event.sender.send(IpcRendererMessages.IMPOSTOR_PUSH_TO_TALK, false);
 				} catch (_) {}
 			}
 			if (
@@ -67,6 +75,14 @@ ipcMain.handle(IpcHandlerMessages.START_HOOK, async (event) => {
 			if (keyCodeMatches(store.get('muteShortcut', 'RAlt') as K, ev)) {
 				try {
 					event.sender.send(IpcRendererMessages.TOGGLE_MUTE);
+				} catch (_) {}
+			}
+		});
+		iohook.on('keyup', (ev: IOHookEvent) => {
+			const ImpostorKey = store.get('ImpostorpushToTalkShortcut');
+			if (!isMouseButton(ImpostorKey) && keyCodeMatches(ImpostorKey as K, ev)) {
+				try {
+					event.sender.send(IpcRendererMessages.IMPOSTOR_PUSH_TO_TALK, false);
 				} catch (_) {}
 			}
 		});

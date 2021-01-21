@@ -175,7 +175,7 @@ class ErrorBoundary extends React.Component<
 
 		return this.props.children;
 	}
-}
+}}
 
 const App: React.FC = function () {
 	const [state, setState] = useState<AppState>(AppState.MENU);
@@ -192,6 +192,7 @@ const App: React.FC = function () {
 		pushToTalk: false,
 		serverURL: 'https://crewl.ink',
 		pushToTalkShortcut: 'V',
+		ImpostorpushToTalkShortcut: 'B',
 		deafenShortcut: 'RControl',
 		muteShortcut: 'RAlt',
 		hideCode: false,

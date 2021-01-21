@@ -198,6 +198,10 @@ const storeConfig: Store.Options<ISettings> = {
 			type: 'string',
 			default: 'V',
 		},
+		ImpostorpushToTalkShortcut: {
+			type: 'string',
+			default: 'B',
+		},
 		deafenShortcut: {
 			type: 'string',
 			default: 'RControl',

@@ -71,6 +71,7 @@ interface ConnectionStuff {
 	socket?: typeof Socket;
 	stream?: MediaStream;
 	pushToTalk: boolean;
+	ImpostorpushToTalk: boolean;
 	deafened: boolean;
 	muted: boolean;
 }
@@ -137,6 +138,15 @@ function calculateVoiceAudio(
 				reverbGain.gain.value = 1;
 			}
 
+			// Mute if not impostors talking, impostors can always hear unless one is dead
+			if (
+				me.isImpostor && other.isImpostor && !other.isDead
+			) {
+				gain.gain.value = 1;
+			} else {
+				gain.gain.value = 0;
+			}
+
 			break;
 		case GameState.DISCUSSION:
 			panPos = [0, 0];
@@ -176,6 +186,15 @@ function calculateVoiceAudio(
 		Math.pow(panPos[0], 2) + Math.pow(panPos[1], 2) >
 		pan.maxDistance * pan.maxDistance
 	) {
+		gain.gain.value = 0;
+	}
+
+	// Mute if not impostors talking, impostors can always hear unless one is dead
+	if (
+		me.isImpostor && other.isImpostor && !other.isDead
+	) {
+		gain.gain.value = 1;
+	} else {
 		gain.gain.value = 0;
 	}
 
@@ -319,6 +338,13 @@ const Voice: React.FC<VoiceProps> = function ({
 		connectionStuff.current.pushToTalk = settings.pushToTalk;
 	}, [settings.pushToTalk]);
 
+	// Handle ImpostorpushToTalk, if set
+	useEffect(() => {
+		if (!connectionStuff.current.stream) return;
+		connectionStuff.current.stream.getAudioTracks()[0].enabled = !settings.ImpostorpushToTalk;
+		connectionStuff.current.ImpostorpushToTalk = settings.ImpostorpushToTalk;
+	}, [settings.ImpostorpushToTalk]);
+
 	// Emit lobby settings to connected peers
 	useEffect(() => {
 		if (gameState.isHost !== true) return;
@@ -388,6 +414,7 @@ const Voice: React.FC<VoiceProps> = function ({
 	// const [audioContext] = useState<AudioContext>(() => new AudioContext());
 	const connectionStuff = useRef<ConnectionStuff>({
 		pushToTalk: settings.pushToTalk,
+		ImpostorpushToTalk: settings.ImpostorpushToTalk,
 		deafened: false,
 		muted: false,
 	});
@@ -455,6 +482,15 @@ const Voice: React.FC<VoiceProps> = function ({
 					IpcRendererMessages.PUSH_TO_TALK,
 					(_: unknown, pressing: boolean) => {
 						if (!connectionStuff.current.pushToTalk) return;
+						if (!connectionStuff.current.deafened) {
+							stream.getAudioTracks()[0].enabled = pressing;
+						}
+					}
+				);
+				ipcRenderer.on(
+					IpcRendererMessages.IMPOSTOR_PUSH_TO_TALK,
+					(_: unknown, pressing: boolean) => {
+						if (!connectionStuff.current.ImpostorpushToTalk) return;
 						if (!connectionStuff.current.deafened) {
 							stream.getAudioTracks()[0].enabled = pressing;
 						}

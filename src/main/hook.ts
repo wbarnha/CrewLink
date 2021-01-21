@@ -53,7 +53,7 @@ ipcMain.handle(IpcHandlerMessages.START_HOOK, async (event) => {
 			const ImpostorKey = store.get('ImpostorpushToTalkShortcut');
 			if (!isMouseButton(ImpostorKey) && keyCodeMatches(ImpostorKey as K, ev)) {
 				try {
-					event.sender.send(IpcRendererMessages.PUSH_TO_TALK, true);
+					event.sender.send(IpcRendererMessages.IMPOSTOR_PUSH_TO_TALK, true);
 				} catch (_) {}
 			}
 		});
@@ -61,7 +61,7 @@ ipcMain.handle(IpcHandlerMessages.START_HOOK, async (event) => {
 			const shortcutKey = store.get('pushToTalkShortcut');
 			if (!isMouseButton(shortcutKey) && keyCodeMatches(shortcutKey as K, ev)) {
 				try {
-					event.sender.send(IpcRendererMessages.IMPOSTOR_PUSH_TO_TALK, false);
+					event.sender.send(IpcRendererMessages.PUSH_TO_TALK, false);
 				} catch (_) {}
 			}
 			if (
